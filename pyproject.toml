@@ -37,6 +37,12 @@ target-version = "py314"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "N", "ARG", "SIM", "ERA", "PLR", "C901"]
 
+[tool.ruff.lint.per-file-ignores]
+# Test assertions routinely compare against literal expected values (e.g.
+# `assert config.seed == 7`) — that's the point of the assertion, not a code
+# smell to name a constant for.
+"tests/*" = ["PLR2004"]
+
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
