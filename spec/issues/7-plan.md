@@ -120,6 +120,7 @@ def contribution(self, locus, string) -> float:
     key = bits_to_int([string[locus], *(string[p] for p in self.partners[locus])])
     return self._row(locus)[key]
 
+
 def fitness(self, string) -> float:
     return sum(self.contribution(i, string) for i in range(self.N)) / self.N
 ```
