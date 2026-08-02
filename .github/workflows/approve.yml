@@ -13,8 +13,8 @@ on:
     types: [created]
 
 # Least privilege: the launcher only launches the agent. The Scrum Master does
-# its own repo/issue/PR writes via the GitHub MCP server (GH_MCP_TOKEN secret,
-# renamed from GITHUB_MCP_TOKEN — GitHub reserves the GITHUB_ name prefix).
+# its own repo/issue/PR writes via the GitHub MCP server, authenticated by a
+# vault credential attached to the session.
 permissions:
   contents: read
 
@@ -52,12 +52,11 @@ jobs:
             Build for its issue (awaited), then judge Build's structured result:
             proceed (Build flipped the draft PR to ready), escalate, or re-plan.
             Do not merge.
-          # Secrets.
+          # Secret. GitHub access is via the vault-authenticated MCP server, so
+          # no GitHub token is passed here.
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github-mcp-token: ${{ secrets.GH_MCP_TOKEN }}
           # Non-secret identifiers — Actions Variables, not Secrets.
           agent-id: ${{ vars.SCRUM_MASTER_AGENT_ID }}
           environment-id: ${{ vars.SCRUM_MASTER_ENVIRONMENT_ID }}
           vault-id: ${{ vars.SCRUM_MASTER_VAULT_ID }}
           ant-cli-version: ${{ vars.ANT_CLI_VERSION }}
-          repository: ${{ github.repository }}
