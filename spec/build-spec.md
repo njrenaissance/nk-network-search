@@ -169,21 +169,73 @@ Record per step:
 ## 10. Config (`config.py`)
 
 ```python
-@dataclass
-class NKConfig:
-    N: int = 20
-    K: int = 5                 # 0 (smooth) … N-1 (max rugged)
-    B: int = 2                 # values per locus; start binary
-    scheme: str = "adjacent"   # or "random"
-    A: int = 100               # agents
-    topology: str = "complete" # ring | ws | random_regular | complete
-    ws_k: int = 4
-    ws_p: float = 0.1
-    degree: int = 4
-    steps: int = 300
-    replications: int = 50     # over landscapes × initial strings × network draws
-    seed: int = 0
+from functools import lru_cache
+from typing import Any, Literal
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Every non-secret default in ONE place (config standard: no scattered literals).
+DEFAULTS: dict[str, Any] = {
+    "N": 20,             # loci / string length
+    "K": 5,              # 0 (smooth) … N-1 (max rugged)
+    "B": 2,              # values per locus; start binary
+    "scheme": "adjacent",
+    "A": 100,            # agents
+    "topology": "complete",
+    "ws_k": 4,
+    "ws_p": 0.1,
+    "degree": 4,
+    "steps": 300,        # synchronous turns per run
+    "replications": 50,  # over landscapes × initial strings × network draws
+    "seed": 0,
+}
+
+
+class NKConfig(BaseSettings):
+    """Simulation config. A pydantic-settings BaseSettings so any knob can be
+    overridden from the environment or .env (e.g. NK_K=10, NK_TOPOLOGY=ring)
+    without editing code; real env vars take precedence over .env."""
+
+    model_config = SettingsConfigDict(env_prefix="NK_", env_file=".env")
+
+    N: int = DEFAULTS["N"]
+    K: int = DEFAULTS["K"]
+    B: int = DEFAULTS["B"]
+    scheme: Literal["adjacent", "random"] = DEFAULTS["scheme"]
+    A: int = DEFAULTS["A"]
+    topology: Literal["ring", "ws", "random_regular", "complete"] = DEFAULTS["topology"]
+    ws_k: int = DEFAULTS["ws_k"]
+    ws_p: float = DEFAULTS["ws_p"]
+    degree: int = DEFAULTS["degree"]
+    steps: int = DEFAULTS["steps"]
+    replications: int = DEFAULTS["replications"]
+    seed: int = DEFAULTS["seed"]
+
+
+@lru_cache
+def get_config() -> NKConfig:
+    """The one cached config instance — import this, don't re-instantiate."""
+    return NKConfig()
 ```
+
+> **Config framework.** Changed from the original `@dataclass` sketch to
+> **`pydantic-settings`** per this project's configuration standard (Profile:
+> *App config (pydantic-settings): enabled*) and the reviewer request on PR #5.
+> `pydantic-settings` is already a project dependency, so no `pyproject.toml` change
+> is needed. Notes:
+>
+> - Enumerated knobs (`scheme`, `topology`) are `Literal`-typed, so an invalid value
+>   fails loudly at load time instead of deep inside a builder.
+> - Every non-secret default lives once in `DEFAULTS`; the fields reference it, so
+>   `NKConfig()` still picks up env / `.env` overrides (init kwargs > env > `.env` >
+>   field default). There are no secrets here, so no `SecretStr` fields.
+> - Sweeps build explicit per-cell configs — `NKConfig(**{**DEFAULTS, "K": 10,
+>   "topology": "ring"})` — validated the same way; init kwargs win, so a sweep cell
+>   is deterministic regardless of ambient environment.
+> - Ship a `.env.example` listing every `NK_*` variable with its placeholder default.
+> - Kept flat (not nested `BaseSettings` sections) because `run.py` varies individual
+>   knobs per sweep cell and a single well-named block is the most ergonomic for that;
+>   revisit nesting if the knob count grows.
 
 Starting values for learning (not the paper's exact constants): N=20, K∈{0,5,10},
 B=2, A=100, steps≈300, replications≥50. If you want to match the paper's figures,

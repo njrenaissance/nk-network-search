@@ -11,7 +11,9 @@ long-run performance.
 
 ## Inputs / Outputs
 
-**Input** — a single `NKConfig` (dataclass) value:
+**Input** — a single `NKConfig` value, a `pydantic-settings` `BaseSettings` (env
+prefix `NK_`, `.env`-aware) so any knob can be overridden by an environment variable
+or per sweep cell:
 
 - `N: int` — string length / number of loci (default 20)
 - `K: int` — interacting partners per locus, `0 … N-1` (landscape ruggedness)
@@ -89,6 +91,16 @@ changes results, so each is fixed and documented):
 
 Stochastic criteria run with a fixed `seed` and enough `replications` to be
 deterministic under test.
+
+**Config**
+
+- `NKConfig()` populates every field from the single `DEFAULTS` dict, and
+  `get_config()` returns a cached singleton (the same object on repeated calls).
+- Fields are validated at load: a non-numeric `K`, or a `scheme` / `topology` outside
+  its allowed set, raises `pydantic.ValidationError`.
+- Environment overrides apply: with `NK_SEED=7` in the environment,
+  `get_config().seed == 7`, and a real env var takes precedence over the same key in
+  `.env`.
 
 **Landscape** *(test_landscape)*
 
