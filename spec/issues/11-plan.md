@@ -1,6 +1,6 @@
 # Plan — Issue #11: synchronous turn-loop `Model` (`model.py`)
 
-**Status:** proposed
+**Status:** approved
 
 **Status of this document.** Planning-only. No production logic in this PR — per
 `.claude/standards/testing.md`, tests are written and agreed *before*
