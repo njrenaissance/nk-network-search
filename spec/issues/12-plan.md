@@ -1,6 +1,6 @@
 # Plan — Issue #12: `run.py` — single run + topology×K sweep, headline results
 
-**Status:** proposed
+**Status:** approved
 
 **Status of this document.** Planning-only. No production logic in this PR — per
 `.claude/standards/testing.md`, tests are written and agreed *before*
