@@ -33,6 +33,10 @@ show_missing = true
 [tool.ruff]
 line-length = 120
 target-version = "py314"
+# Don't lint or format Python code blocks embedded in Markdown. ruff formats
+# fenced ```python blocks in .md by default; docs (e.g. spec/*.md) carry
+# illustrative snippets that aren't held to the source formatting standard.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "N", "ARG", "SIM", "ERA", "PLR", "C901"]
