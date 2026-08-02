@@ -1,6 +1,6 @@
 # spec.md
 
-**Status:** draft
+**Status:** approved
 
 ## Purpose
 
