@@ -3,13 +3,8 @@
 Implements the per-agent half of the NK networked-search turn: an agent holds
 only a candidate solution string, and reads its fitness from the landscape on
 demand rather than owning or caching a fitness value independently. See
-`spec/issues/9-plan.md` for the design this satisfies.
-
-Status of this file: signatures-only stub, committed alongside the approved
-plan and the locked `tests/test_agent.py` red test suite (issue #9). Every
-method currently raises `NotImplementedError` so the test suite collects but
-fails for the right reason -- Build fills in the real logic after human
-approval of the plan.
+`spec/issues/9-plan.md` for the design and full acceptance criteria this
+module satisfies.
 """
 
 from __future__ import annotations
@@ -39,4 +34,15 @@ class Agent:
         `spec/issues/9-plan.md` for the exploit/explore rule and the
         tie-break convention `neighbor_states` ordering relies on.
         """
-        raise NotImplementedError
+        my_fitness = landscape.fitness(self.string)
+
+        best_neighbor = max(neighbor_states, key=landscape.fitness, default=None)
+        if best_neighbor is not None and landscape.fitness(best_neighbor) > my_fitness:
+            return list(best_neighbor)  # EXPLOIT
+
+        candidate = list(self.string)
+        flip_index = rng.randrange(len(candidate))
+        candidate[flip_index] ^= 1
+        if landscape.fitness(candidate) > my_fitness:
+            return candidate  # EXPLORE: accepted
+        return list(self.string)  # EXPLORE: rejected
