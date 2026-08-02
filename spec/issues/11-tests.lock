@@ -1,0 +1,9 @@
+# Test lock for issue #11 (Model).
+#
+# Pins the git blob SHA (`git hash-object <path>`) of each committed test file
+# at the point the human approved this plan. Build's pre-push test-integrity
+# guard verifies the file still hashes to this value — Build may add new
+# tests, but may not weaken, delete, or reinterpret these ones. A genuine
+# change to this test file requires a new Planner-approved lock, not a Build
+# edit.
+tests/test_model.py  cf327971f930dc8ae83973e40ab7256a32f8ce48
