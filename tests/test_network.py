@@ -2,6 +2,7 @@ import random
 
 import networkx as nx
 import pytest
+
 from nkmodel.config import NKConfig
 from nkmodel.network import (
     build_network,
