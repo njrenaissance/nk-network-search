@@ -26,9 +26,13 @@ Cross-cutting concerns enabled for this project:
 
 ```text
 ├── src/
-│   └── main.py       # greet()
-├── tests/
-│   └── test_main.py  # test for greet()
+│   └── nkmodel/      # NK networked-search package
+│       ├── config.py     # NKConfig + get_config()
+│       ├── landscape.py  # NKLandscape (NK fitness model)
+│       ├── network.py    # topology builders + build_network()
+│       └── agent.py      # Agent (exploit/explore decision)
+├── tests/            # unit tests mirroring nkmodel/
+├── spec/             # design notes + acceptance criteria
 └── pyproject.toml
 ```
 
