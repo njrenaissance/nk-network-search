@@ -1,6 +1,6 @@
 # Plan — Issue #9: Agent exploit/explore decision (`agent.py`)
 
-**Status:** proposed
+**Status:** approved
 
 **Status of this document.** Planning-only. No production code in this PR — per
 `.claude/standards/testing.md`, tests are written and agreed *before*
