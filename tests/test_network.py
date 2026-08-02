@@ -2,6 +2,7 @@ import random
 
 import networkx as nx
 import pytest
+from nkmodel.config import NKConfig
 from nkmodel.network import (
     build_network,
     complete,
@@ -10,8 +11,6 @@ from nkmodel.network import (
     ring_lattice,
     watts_strogatz,
 )
-
-from nkmodel.config import NKConfig
 
 A = 10
 
