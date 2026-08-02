@@ -56,7 +56,7 @@ runs:
       env:
         # ant reads ANTHROPIC_API_KEY from the environment.
         ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
-        GITHUB_MCP_TOKEN: ${{ inputs.github-mcp-token }}
+        GH_MCP_TOKEN: ${{ inputs.github-mcp-token }}
         AGENT_ID: ${{ inputs.agent-id }}
         ENV_ID: ${{ inputs.environment-id }}
         VAULT_ID: ${{ inputs.vault-id }}
@@ -65,7 +65,7 @@ runs:
         KICKOFF: ${{ inputs.kickoff-message }}
       run: |
         set -euo pipefail
-        for v in ANTHROPIC_API_KEY GITHUB_MCP_TOKEN AGENT_ID ENV_ID VAULT_ID; do
+        for v in ANTHROPIC_API_KEY GH_MCP_TOKEN AGENT_ID ENV_ID VAULT_ID; do
           if [ -z "${!v:-}" ]; then
             echo "::error::Missing required value: $v"
             exit 1
@@ -80,7 +80,7 @@ runs:
           --arg env "$ENV_ID" \
           --arg title "$TITLE" \
           --arg url "https://github.com/$REPO" \
-          --arg token "$GITHUB_MCP_TOKEN" \
+          --arg token "$GH_MCP_TOKEN" \
           --arg vault "$VAULT_ID" \
           '{
             agent: $agent,

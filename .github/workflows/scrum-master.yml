@@ -32,7 +32,8 @@ concurrency:
 
 # Least privilege: the launcher itself needs nothing beyond reading the repo.
 # The Scrum Master does its own repo/issue writes via the GitHub MCP server,
-# authenticated with GITHUB_MCP_TOKEN (below), not the workflow's GITHUB_TOKEN.
+# authenticated with the GH_MCP_TOKEN secret (renamed from GITHUB_MCP_TOKEN —
+# GitHub reserves the GITHUB_ name prefix), not the workflow's GITHUB_TOKEN.
 permissions:
   contents: read
 
@@ -64,7 +65,7 @@ jobs:
             Otherwise no-op. Do not use labels for control flow.
           # Secrets.
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github-mcp-token: ${{ secrets.GITHUB_MCP_TOKEN }}
+          github-mcp-token: ${{ secrets.GH_MCP_TOKEN }}
           # Non-secret identifiers — Actions Variables, not Secrets.
           agent-id: ${{ vars.SCRUM_MASTER_AGENT_ID }}
           environment-id: ${{ vars.SCRUM_MASTER_ENVIRONMENT_ID }}
