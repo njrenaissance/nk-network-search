@@ -1,6 +1,6 @@
 # Plan — Issue #7: NKLandscape fitness model (`landscape.py`)
 
-**Status:** proposed
+**Status:** approved
 
 **Status of this document.** Planning-only. No production code in this PR — per
 `.claude/standards/testing.md`, tests are written and agreed *before*
