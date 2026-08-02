@@ -68,12 +68,12 @@ Facts locked in from our walkthrough:
 class NKLandscape:
     def __init__(self, N, K, scheme="adjacent", rng=...):
         self.N, self.K = N, K
-        self.partners = self._build_partners(scheme)   # list[list[int]], length N
-        self.tables = {}                                # lazy: (locus, key_bits) -> float
+        self.partners = self._build_partners(scheme)  # list[list[int]], length N
+        self.tables = {}  # lazy: (locus, key_bits) -> float
 
     def contribution(self, locus, string) -> float:
         key = tuple(string[j] for j in [locus, *self.partners[locus]])
-        if (locus, key) not in self.tables:             # lazy fill — only visited configs
+        if (locus, key) not in self.tables:  # lazy fill — only visited configs
             self.tables[(locus, key)] = self.rng.random()
         return self.tables[(locus, key)]
 
@@ -97,16 +97,18 @@ never store-and-copy fitness independently).
 class Agent:
     def __init__(self, uid, string):
         self.uid = uid
-        self.string = string          # list[int] length N
+        self.string = string  # list[int] length N
 
     def decide(self, neighbor_states, landscape, rng) -> list[int]:
         """Return this agent's NEXT string. Pure function of the start-of-turn snapshot."""
         my_fit = landscape.fitness(self.string)
         best = max(neighbor_states, key=lambda s: landscape.fitness(s), default=None)
         if best is not None and landscape.fitness(best) > my_fit:
-            return list(best)                              # EXPLOIT: copy best neighbor's string
+            return list(best)  # EXPLOIT: copy best neighbor's string
         # EXPLORE: one random bit-flip, keep only if strictly better
-        cand = list(self.string); i = rng.randrange(len(cand)); cand[i] ^= 1
+        cand = list(self.string)
+        i = rng.randrange(len(cand))
+        cand[i] ^= 1
         return cand if landscape.fitness(cand) > my_fit else list(self.string)
 ```
 
@@ -118,12 +120,12 @@ another's mid-turn move.
 
 ```python
 def step(self):
-    snapshot = {a.uid: list(a.string) for a in self.agents}          # freeze
+    snapshot = {a.uid: list(a.string) for a in self.agents}  # freeze
     next_strings = {}
     for a in self.agents:
-        neigh = [snapshot[n] for n in self.graph.neighbors(a.uid)]   # start-of-turn states
+        neigh = [snapshot[n] for n in self.graph.neighbors(a.uid)]  # start-of-turn states
         next_strings[a.uid] = a.decide(neigh, self.landscape, self.rng)
-    for a in self.agents:                                            # commit
+    for a in self.agents:  # commit
         a.string = next_strings[a.uid]
     self.metrics.record(self)
 ```
@@ -176,16 +178,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Every non-secret default in ONE place (config standard: no scattered literals).
 DEFAULTS: dict[str, Any] = {
-    "N": 20,             # loci / string length
-    "K": 5,              # 0 (smooth) … N-1 (max rugged)
-    "B": 2,              # values per locus; start binary
+    "N": 20,  # loci / string length
+    "K": 5,  # 0 (smooth) … N-1 (max rugged)
+    "B": 2,  # values per locus; start binary
     "scheme": "adjacent",
-    "A": 100,            # agents
+    "A": 100,  # agents
     "topology": "complete",
     "ws_k": 4,
     "ws_p": 0.1,
     "degree": 4,
-    "steps": 300,        # synchronous turns per run
+    "steps": 300,  # synchronous turns per run
     "replications": 50,  # over landscapes × initial strings × network draws
     "seed": 0,
 }
