@@ -33,29 +33,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Launch Scrum Master managed agent (approve event)
-        env:
-          # Passed via env (never interpolated into the run: script) to avoid
-          # shell-injection from event context.
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          REPO: ${{ github.repository }}
-          PR: ${{ github.event.issue.number }}
-        run: |
-          # TODO(managed-agents-api): wire the launch call once the endpoint,
-          # anthropic-beta header, and the mechanism that references the
-          # Scrum Master agent spec (managed-agents/scrum-master.yml, uploaded to
-          # the workspace) are pinned. The launch must:
-          #   1. Create a Scrum Master managed-agent session for the approve event.
-          #   2. Attach $REPO as a `github_repository` Resource (cloned at main),
-          #      and supply $GITHUB_MCP_TOKEN as the agent's GitHub MCP server
-          #      `authorization_token` (repo + issues write scope).
-          #   3. Send the kickoff user.message below.
-          #
-          # Kickoff user.message (keep in sync with
-          # _workflow/managed-agents/README.md):
-          #   "Plan approved on PR #$PR in $REPO. Record Status: approved on that
-          #    plan, spawn Build for its issue (awaited), then judge Build's
-          #    structured result: proceed (Build flipped the draft PR to ready),
-          #    escalate, or re-plan. Do not merge."
-          echo "::error::Approve launcher is not wired to the managed-agents API yet. Implement the launch call in .github/workflows/approve.yml (see the TODO above) and set the ANTHROPIC_API_KEY and GITHUB_MCP_TOKEN repository secrets. Fails loudly by design so an unwired launcher is never mistaken for a working one."
-          exit 1
+      # The local composite action must be checked out before it can be used.
+      - name: Check out launcher action
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # actions/checkout
+        with:
+          persist-credentials: false
+
+      - name: Launch Scrum Master (approve event)
+        uses: ./.github/actions/launch-scrum-master
+        with:
+          title: "Scrum Master approve: ${{ github.repository }} PR #${{ github.event.issue.number }}"
+          # issue.number is an integer and repository is trusted; the action
+          # passes every input through env + jq, never a raw run: string.
+          kickoff-message: >-
+            Plan approved on PR #${{ github.event.issue.number }} in
+            ${{ github.repository }}. Record Status: approved on that plan, spawn
+            Build for its issue (awaited), then judge Build's structured result:
+            proceed (Build flipped the draft PR to ready), escalate, or re-plan.
+            Do not merge.
+          # Secrets.
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github-mcp-token: ${{ secrets.GITHUB_MCP_TOKEN }}
+          # Non-secret identifiers — Actions Variables, not Secrets.
+          agent-id: ${{ vars.SCRUM_MASTER_AGENT_ID }}
+          environment-id: ${{ vars.SCRUM_MASTER_ENVIRONMENT_ID }}
+          vault-id: ${{ vars.SCRUM_MASTER_VAULT_ID }}
+          ant-cli-version: ${{ vars.ANT_CLI_VERSION }}
+          repository: ${{ github.repository }}
