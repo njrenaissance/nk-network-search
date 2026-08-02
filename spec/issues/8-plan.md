@@ -1,6 +1,6 @@
 # Plan — Issue #8: network topology builders (`network.py`)
 
-**Status:** proposed
+**Status:** approved
 
 **Status of this document.** Planning-only. No production code in this PR — per
 `.claude/standards/testing.md`, tests are written and agreed *before*
