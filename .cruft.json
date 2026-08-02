@@ -1,0 +1,21 @@
+{
+  "template": "https://github.com/njrenaissance/project-templates",
+  "commit": "8e4394dc6126cb591ac8481dfcc7da512dbef26a",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "nk-network-search",
+      "project_slug": "nk-network-search",
+      "author": "Jonathan Phillips",
+      "python_version": "3.14",
+      "app_config": "yes",
+      "structured_logging": "no",
+      "telemetry": "no",
+      "security": "no",
+      "coding_factory": "yes",
+      "_template": "https://github.com/njrenaissance/project-templates",
+      "_commit": "8e4394dc6126cb591ac8481dfcc7da512dbef26a"
+    }
+  },
+  "directory": "basic"
+}
