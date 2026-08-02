@@ -32,8 +32,8 @@ concurrency:
 
 # Least privilege: the launcher itself needs nothing beyond reading the repo.
 # The Scrum Master does its own repo/issue writes via the GitHub MCP server,
-# authenticated with the GH_MCP_TOKEN secret (renamed from GITHUB_MCP_TOKEN —
-# GitHub reserves the GITHUB_ name prefix), not the workflow's GITHUB_TOKEN.
+# authenticated by a vault credential attached to the session, not the
+# workflow's GITHUB_TOKEN.
 permissions:
   contents: read
 
@@ -63,12 +63,11 @@ jobs:
             issue is merged, launch the next group's Planners (JIT — the ready group
             only, never the backlog); when all issues are merged, mark Deliver-ready.
             Otherwise no-op. Do not use labels for control flow.
-          # Secrets.
+          # Secret. GitHub access is via the vault-authenticated MCP server, so
+          # no GitHub token is passed here.
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github-mcp-token: ${{ secrets.GH_MCP_TOKEN }}
           # Non-secret identifiers — Actions Variables, not Secrets.
           agent-id: ${{ vars.SCRUM_MASTER_AGENT_ID }}
           environment-id: ${{ vars.SCRUM_MASTER_ENVIRONMENT_ID }}
           vault-id: ${{ vars.SCRUM_MASTER_VAULT_ID }}
           ant-cli-version: ${{ vars.ANT_CLI_VERSION }}
-          repository: ${{ github.repository }}
