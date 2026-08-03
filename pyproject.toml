@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "nk-network-search"
 requires-python = ">=3.14"
 dependencies = [
+    "matplotlib>=3.11.1",
     "networkx>=3.6.1",
     "pydantic-settings>=2.6.0",
     "python-dotenv>=1.0.0",
