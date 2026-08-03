@@ -18,25 +18,34 @@ It is a small, fully typed Python package (`nkmodel`) built on
 | `nkmodel/landscape.py` | `NKLandscape` — per-locus contribution tables and the NK fitness function |
 | `nkmodel/agent.py` | `Agent` — holds a candidate string; the exploit/explore turn decision |
 | `nkmodel/network.py` | Topology builders (`ring`, `watts_strogatz`, `random_regular`, `complete`) + `build_network()` |
+| `nkmodel/metrics.py` | Per-step mean/best fitness, diversity, and convergence time |
+| `nkmodel/model.py` | `Model` — the synchronous turn loop over landscape + agents + network + metrics |
 | `nkmodel/config.py` | `NKConfig` (`pydantic-settings`) + the cached `get_config()` accessor |
+| `run.py` | Single run, replication averaging, topology×K sweep, and CSV persistence |
+| `analysis.py` | Fitness/diversity curves and the inverted-U figure, rendered from the sweep CSVs |
 
 The experiment's design and acceptance criteria live in [`spec/`](spec/)
 (`spec.md`, `build-spec.md`, `build-order.md`, and per-issue plans under
-`spec/issues/`). The spec also describes runner scripts (`run.py`, `analysis.py`)
-and `model`/`metrics` modules that tie the pieces into a full simulation loop;
-those are planned but **not yet implemented** — today the package provides the
-building blocks the unit tests assert against.
+`spec/issues/`). `run.py` and `analysis.py` are thin scripts beside the package
+under `src/`: `run.py` drives single runs and topology×K sweeps and writes each
+cell's metric series to disk as a `{topology}_K{k}.csv` file, and `analysis.py`
+reads those CSVs back into the fitness/diversity curves and the inverted-U
+figure (written to a git-ignored `figures/` directory).
 
 ## Structure
 
 ```text
 ├── src/
-│   └── nkmodel/
-│       ├── __init__.py
-│       ├── config.py      # NKConfig + get_config()
-│       ├── landscape.py   # NKLandscape (NK fitness model)
-│       ├── network.py     # topology builders + build_network()
-│       └── agent.py       # Agent (exploit/explore decision)
+│   ├── nkmodel/
+│   │   ├── __init__.py
+│   │   ├── config.py      # NKConfig + get_config()
+│   │   ├── landscape.py   # NKLandscape (NK fitness model)
+│   │   ├── network.py     # topology builders + build_network()
+│   │   ├── agent.py       # Agent (exploit/explore decision)
+│   │   ├── metrics.py     # mean/best fitness, diversity, convergence time
+│   │   └── model.py       # synchronous turn-loop Model
+│   ├── run.py             # single run + topology×K sweep + CSV persistence
+│   └── analysis.py        # fitness/diversity curves + inverted-U figure
 ├── tests/                 # unit tests mirroring nkmodel/ (plus conftest.py)
 ├── spec/                  # design notes + acceptance criteria
 ├── Makefile
@@ -49,7 +58,7 @@ building blocks the unit tests assert against.
 - [uv](https://docs.astral.sh/uv/) for dependency management
 
 Runtime dependencies (see `pyproject.toml`): `networkx`, `pydantic-settings`,
-`python-dotenv`.
+`python-dotenv`, `matplotlib` (figures).
 
 ## Setup
 
@@ -100,8 +109,27 @@ cp .env.example .env
 
 ## Usage
 
-There is no top-level runner yet (see the `spec/` note above), so the package is
-used as a library. The building blocks compose like this:
+`run.py` drives the simulation and `analysis.py` turns its output into figures.
+A topology×K sweep, persisted to CSV and then rendered:
+
+```python
+from pathlib import Path
+
+from analysis import generate_figures
+from nkmodel.config import get_config
+from run import run_sweep, write_sweep_results
+
+config = get_config()  # NK_* env vars / .env, else defaults
+
+results = run_sweep(config, topologies=["ring", "complete"], k_values=[0, 5], seed=config.seed)
+
+Path("output").mkdir(exist_ok=True)
+write_sweep_results(results, "output")   # one {topology}_K{k}.csv per cell
+generate_figures("output", "figures")    # fitness/diversity curves + the inverted-U
+```
+
+The package is also usable directly as a library — build a landscape, network,
+and agents and drive the turns yourself:
 
 ```python
 import random
