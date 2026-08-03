@@ -1,6 +1,6 @@
 # spec.md
 
-**Status:** approved
+**Status:** deliver-ready
 
 ## Purpose
 
