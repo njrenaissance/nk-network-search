@@ -1,6 +1,6 @@
 # Plan — Issue #13: `analysis.py` — fitness/diversity curves and inverted-U figure
 
-**Status:** proposed
+**Status:** approved
 
 Refs #13. Group 6 of 6 (`spec/build-order.md`), depends on #12 (`run.py`'s
 on-disk `MetricsRow` series format, merged).
